@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+THISDIR=$( cd `dirname $0` && pwd )
+ENTITYNAME=$(basename ${THISDIR})
+
+#Defines TheSDK environment variables
+. ${THISDIR}/../../TheSDK.config
+
+if [ -d ./chisel ]; then
+    echo "Configuring ${ENTITYNEME} chisel generator"
+    cd $THISDIR/chisel && ./configure && cd ..
+fi
+
+CURRENTFILE=${THISDIR}/Makefile
+echo "Generating Makefile"
+
+if [ -d ./chisel ]; then
+cat << EOF > ${THISDIR}/Makefile
+
+.PHONY: all sim chisel clean
+
+all: chisel sim
+
+sim: chisel
+	cd ${THISDIR}/${ENTITYNAME} && \\
+	${PYL} __init__.py
+
+chisel:
+	cd $THISDIR/chisel && \\
+	make 
+    
+#n=64 lanes=64
+
+clean:
+	cd ${THISDIR}/chisel && \\
+	make clean && \\
+	find ${THISDIR}/Simulations -name \*tmp\*.txt -exec rm {} \\; 
+   
+EOF
+else
+cat << EOF > ${THISDIR}/Makefile
+
+.PHONY: all sim clean
+
+all: sim
+
+sim:
+	cd ${THISDIR}/${ENTITYNAME} && \\
+	${PYL} __init__.py
+
+clean:
+	find ${THISDIR}/Simulations -name \*tmp\*.txt -exec rm {} \\; 
+   
+EOF
+fi
+exit 0
+
