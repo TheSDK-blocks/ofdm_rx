@@ -9,7 +9,6 @@ import tempfile
 
 from thesdk import *
 from verilog import *
-from vhdl import *
 
 class ofdm_rx(verilog,vhdl,thesdk):
     #Classfile is required by verilog and vhdl classes to determine paths.
@@ -21,6 +20,9 @@ class ofdm_rx(verilog,vhdl,thesdk):
         self.proplist = [ 'Rs' ];    # Properties that can be propagated from parent
         self.Rs =  100e6;            # Sampling frequency
         self.iptr_A = IO();          # Pointer for input data
+        self.io_iqSamples = IO();    # Pointer for input data
+        self._io_syncMetric = IO();   # Pointer for output data
+        self.control_write = IO();   # Pointer for control inputs
         self.model='py';             # Can be set externally, but is not propagated
         self.par= False              # By default, no parallel processing
         self.queue= []               # By default, no parallel processing
@@ -32,9 +34,6 @@ class ofdm_rx(verilog,vhdl,thesdk):
         self.init()
 
     def init(self):
-        #This gets updated every time you add an iofile
-        self.iofile_bundle=Bundle()
-        # Define the outputfile
 
         # Adds an entry named self._iofile_Bundle.Members['Z']
         if self.model=='sv':
